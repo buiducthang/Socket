@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class TestServer {
     ServerSocket serverSocket;
     Socket clientSocket;
-
+    ArrayList<TestServerThread> clients = new ArrayList<>();
     public TestServer() {
         try {
             serverSocket = new ServerSocket(9000);
@@ -29,8 +29,24 @@ public class TestServer {
             
             while(true){
                 clientSocket = serverSocket.accept();
-                TestServerThread serverThread = new TestServerThread(clientSocket);
-                serverThread.start();
+                TestServerThread serverThread = new TestServerThread(clientSocket,"sent");
+                
+                clients.add(serverThread);
+                System.out.println("aaaa");
+                ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+                String msg = (String) ois.readObject();
+                
+                System.out.println(msg);
+                for(int i=0;i<clients.size();i++){
+                    System.out.println(String.valueOf(i));
+                    System.out.println("size:" + clients.size());
+                    if(String.valueOf(i).equals(msg)){
+                        //clients.get(i).setClientSocket(clientSocket);
+                        clients.get(i).setMsg(msg);
+                        clients.get(i).start();
+                    }
+                }
+                
 //                ArrayList<Socket> clients = new ArrayList<>();
 //                //clients.add(serverSocket.accept());
 //                ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
@@ -47,6 +63,8 @@ public class TestServer {
             }
         } catch (IOException ex) {
             System.out.println(ex.toString());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TestServer.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
     

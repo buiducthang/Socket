@@ -18,24 +18,52 @@ import java.util.logging.Logger;
  * @author Bui
  */
 public class TestClient {
-    public static void main(String[] args) {
+    
+    ObjectInputStream ois = null;
+    ObjectOutputStream oos = null;
+    Socket clientSocket;
+    
+    public TestClient() throws IOException{
+        clientSocket = new Socket("127.0.0.1",9000);
+    }
+    
+    public String Client(String input) {
         try {
-            System.out.println("Nhap ki tu:");
-            Scanner input = new Scanner(System.in);
             
-            Socket clientSocket = new Socket("127.0.0.1",9000);
-            ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            oos.writeObject(input.nextLine());
+            
+            oos = new ObjectOutputStream(clientSocket.getOutputStream());
+            oos.writeObject(input);
             oos.flush();
-            ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+            ois = new ObjectInputStream(clientSocket.getInputStream());
             
-            Object o = ois.readObject();
-            System.out.println(o.toString());
+            return (String)ois.readObject();
         } catch (IOException ex) {
             System.out.println(ex.toString());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(TestClient.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } /*catch (ClassNotFoundException ex) {
+            Logger.getLogger(TestClient.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        return null;
         
+    }
+    
+    public static void main(String[] args) throws IOException {
+        boolean stop = true;
+        TestClient client = new TestClient();
+        while(stop){
+            System.out.println("Nhap ki tu:");
+            Scanner input = new Scanner(System.in);
+            String in = input.nextLine();
+            
+            if(in.equals("stop")) {
+                stop = false;
+                return;
+            }
+            
+            String msg = client.Client(in);
+            
+            System.out.println("Server:" + msg);
+        }
     }
 }

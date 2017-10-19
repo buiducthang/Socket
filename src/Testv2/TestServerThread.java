@@ -19,26 +19,41 @@ import java.util.logging.Logger;
  */
 public class TestServerThread extends Thread{
     protected Socket clientSocket;
+    protected String msg;
     
-    public TestServerThread(Socket socket){
+    public TestServerThread(Socket socket, String msg){
         this.clientSocket = socket;
+        this.msg = msg;
+    }
+
+    TestServerThread(Socket socket) {
+        this.clientSocket = socket;
+    }
+
+    public void setClientSocket(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
     
     public void run(){
-        ObjectInputStream ois = null;
+        //ObjectInputStream ois = null;
         try {
-            ois = new ObjectInputStream(clientSocket.getInputStream());
+            //ois = new ObjectInputStream(clientSocket.getInputStream());
             ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            Object o = ois.readObject();
-            if(o instanceof String)
+            //Object o = ois.readObject();
+            /*if(o instanceof String)
             {
                 //int rs = (Strin)o + 2;
                 System.out.println("rs:"+o.toString());
                 oos.writeObject(o.toString());
-            }
+            }*/
+            oos.writeObject(msg);
         } catch (IOException ex) {
             Logger.getLogger(TestServerThread.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } /*catch (ClassNotFoundException ex) {
             Logger.getLogger(TestServerThread.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -46,6 +61,6 @@ public class TestServerThread extends Thread{
             } catch (IOException ex) {
                 Logger.getLogger(TestServerThread.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }*/
     }
 }
